@@ -135,14 +135,21 @@ public class WxMaServiceImpl implements WxMaService, RequestHttp<CloseableHttpCl
 
   @Override
   public WxMaJscode2SessionResult jsCode2SessionInfo(String jsCode) throws WxErrorException {
-    final WxMaConfig config = getWxMaConfig();
     Map<String, String> params = new HashMap<>(8);
-    params.put("appid", config.getAppid());
-    params.put("secret", config.getSecret());
-    params.put("js_code", jsCode);
-    params.put("grant_type", "authorization_code");
+    try {
+      final WxMaConfig config = getWxMaConfig();
+      params.put("appid", config.getAppid());
+      params.put("secret", config.getSecret());
+      params.put("js_code", jsCode);
+      params.put("grant_type", "authorization_code");
+    }
+    catch (Exception e)
+    {
+      this.log.info(e.getMessage());
+    }
 
     String result = get(JSCODE_TO_SESSION_URL, Joiner.on("&").withKeyValueSeparator("=").join(params));
+    this.log.info(result);
     return WxMaJscode2SessionResult.fromJson(result);
   }
 
